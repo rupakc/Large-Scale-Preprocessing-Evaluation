@@ -1,0 +1,12 @@
+scikit-learn
+pandas
+daiquiri
+numpy
+pymongo
+six
+tensorflow
+tensorflow_hub
+sentencepiece
+keras
+matplotlib
+
