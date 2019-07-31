@@ -3,12 +3,14 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, MaxAbsScaler, Ro
 from sklearn.preprocessing import FunctionTransformer, QuantileTransformer, PowerTransformer, PolynomialFeatures
 from sklearn.impute import SimpleImputer
 from constants import model_constants
+import pandas as pd
 
 
 def get_scaled_data(dataframe, columns_to_scale='all', type_of_scaling='minmaxscaler'):
     scaler_object = get_scaler_object(type_of_scaling)
     if columns_to_scale.lower() == 'all':
-        dataframe.values = scaler_object.fit_transform(dataframe.values)
+        dataframe = pd.DataFrame(data=scaler_object.fit_transform(dataframe.values), columns=dataframe.columns,
+                                 index=dataframe.index)
     else:
         for column_name in columns_to_scale:
             dataframe[column_name] = scaler_object.fit_transform(dataframe[column_name].values)
