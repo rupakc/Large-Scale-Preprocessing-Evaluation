@@ -38,6 +38,7 @@ def get_encoder_object(type_of_encoding='label'):
     else:
         return OrdinalEncoder()
 
+# TODO - Add encoder and Imputer functions like the scaling function
 
 def get_transformer_object(type_of_transformation='power', function_transform=None,
                            inverse_function=None, power_degree=2):
