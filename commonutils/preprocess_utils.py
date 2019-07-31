@@ -30,6 +30,13 @@ def get_scaler_object(type_of_scaling='minmaxscaler'):
         return Normalizer()
 
 
+def get_encoded_data(dataframe, columns_to_encode, type_of_encoding='label'):
+    encoder_object = get_encoder_object(type_of_encoding)
+    for column in columns_to_encode:
+        dataframe[column] = encoder_object.fit_transform(dataframe[column].values)
+    return dataframe, encoder_object
+
+
 def get_encoder_object(type_of_encoding='label'):
     if type_of_encoding.lower() == model_constants.ONE_HOT_ENCODING:
         return OneHotEncoder()
@@ -38,7 +45,18 @@ def get_encoder_object(type_of_encoding='label'):
     else:
         return OrdinalEncoder()
 
-# TODO - Add encoder and Imputer functions like the scaling function
+
+def get_transformed_data(dataframe, columns_to_transform='all', type_of_transformation='power',
+                         function_transform=None, inverse_function=None, power_degree=2):
+    transformer_object = get_transformer_object(type_of_transformation, function_transform, inverse_function, power_degree)
+    if columns_to_transform.lower() == 'all':
+        dataframe = pd.DataFrame(data=transformer_object.fit_transform(dataframe.values), columns=dataframe.columns,
+                                 index=dataframe.index)
+    else:
+        for column in columns_to_transform:
+            dataframe[column] = transformer_object.fit_transform(dataframe[column].values)
+    return dataframe, transformer_object
+
 
 def get_transformer_object(type_of_transformation='power', function_transform=None,
                            inverse_function=None, power_degree=2):
@@ -52,6 +70,12 @@ def get_transformer_object(type_of_transformation='power', function_transform=No
         return PolynomialFeatures(degree=power_degree)
 
 
+def get_imputed_data(dataframe, columns_to_impute, type_of_imputation='mean'):
+    imputer_object = get_imputer_object(type_of_imputation)
+    for column in columns_to_impute:
+        dataframe[column] = imputer_object.fit_transform(dataframe[column].values)
+    return dataframe, imputer_object
+
+
 def get_imputer_object(type_of_imputation='mean'):
     return SimpleImputer(strategy=type_of_imputation)
-
