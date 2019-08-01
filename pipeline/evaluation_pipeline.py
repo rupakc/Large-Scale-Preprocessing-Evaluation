@@ -11,6 +11,7 @@ Steps in the pipeline to be executed sequentially -
 
 from commonutils import data_load_utils, metric_utils, preprocess_utils
 from models import classifier_models, regressor_models, cluster_models
+from constants import model_constants
 
 
 class EvaluationPipeline:
@@ -39,4 +40,28 @@ class EvaluationPipeline:
                                                           function_transform=function_transform,
                                                           inverse_function=inverse_function, power_degree=power_degree)
         return dataframe
-    
+
+    def get_machine_learning_model(self):
+        if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE:
+            return classifier_models.get_all_classifiers()
+        elif self.type_of_model.lower() == model_constants.REGRESSION_TYPE:
+            return regressor_models.get_all_regressors()
+        else:
+            return cluster_models.get_clustering_algorithm_list()
+
+    def evaluate_model(self,model_list, model_name_list, X_train, X_test, y_train, y_test):
+        metric_dict = dict({})
+        if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE or self.type_of_model.lower() == model_constants.REGRESSION_TYPE:
+            for model, model_name in zip(model_list, model_name_list):
+                model.fit(X_train, y_train)
+                predicted_values = model.predict(X_test)
+                if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE:
+                    metric_dict = metric_utils.get_classification_metrics(y_test, predicted_values)
+                else:
+                    metric_dict = metric_utils.get_regression_metrics(y_test, predicted_values)
+
+        # TODO - Add clustering metrics here
+        return metric_dict
+
+    def persist_evaluation_result(self):
+        pass # TODO - Write code for persisting the results
