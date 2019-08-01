@@ -32,3 +32,12 @@ def get_clustered_data(data_matrix, clustering_algorithm=model_constants.KMEANS,
         kmeans = KMeans(n_clusters=num_clusters, random_state=42)
         kmeans.fit(data_matrix)
         return kmeans.labels_, kmeans
+
+
+def get_clustering_algorithm_list():
+   clustering_model_name_list = [model_constants.AFFINITY_PROP, model_constants.DBSCAN,
+                                 model_constants.KMEANS, model_constants.OPTICS,
+                                 model_constants.AGGLOMERATIVE, model_constants.MEANSHIFT, model_constants.BIRCH]
+   return clustering_model_name_list
+
+

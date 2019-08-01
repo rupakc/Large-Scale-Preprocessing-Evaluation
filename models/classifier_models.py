@@ -1,5 +1,5 @@
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
-from sklearn.svm import LinearSVC, SVC
+from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
@@ -65,7 +65,7 @@ def get_linear_classifiers():
 
 def get_sgd_classifier():
     sgd = SGDClassifier(random_state=42)
-    return ["Stochastic Gradient Descent"] , [sgd]
+    return ["Stochastic Gradient Descent"], [sgd]
 
 
 def get_warm_start_classifiers():
@@ -90,12 +90,31 @@ def get_grad_boost_classifier():
     return ['GradientBoost'], [grad]
 
 
-def get_all_classifiers():
+def get_all_classifiers(n_hidden_units=100, n_neighbors=5):
     classifier_list, classifier_name_list = get_ensemble_tree_classifiers()
-    temp_classifier_list, temp_classifier_name_list = get_support_vector_classifiers()
+    temp_classifier_name_list, temp_classifier_list = get_support_vector_classifiers()
     classifier_list.extend(temp_classifier_list)
     classifier_name_list.extend(temp_classifier_name_list)
-    temp_classifier_list, temp_classifier_name_list = get_linear_classifiers()
+    temp_classifier_name_list, temp_classifier_list = get_linear_classifiers()
     classifier_list.extend(temp_classifier_list)
     classifier_name_list.extend(temp_classifier_name_list)
-    return classifier_name_list , classifier_list
+    temp_classifier_name_list, temp_classifier_list = get_gaussian_process_classifier()
+    classifier_list.extend(temp_classifier_list)
+    classifier_name_list.extend(temp_classifier_name_list)
+    temp_classifier_name_list, temp_classifier_list = get_mlp_classifier(n_hidden_units=n_hidden_units)
+    classifier_list.extend(temp_classifier_list)
+    classifier_name_list.extend(temp_classifier_name_list)
+    temp_classifier_name_list, temp_classifier_list = get_naive_bayes_classifiers()
+    classifier_list.extend(temp_classifier_list)
+    classifier_name_list.extend(temp_classifier_name_list)
+    temp_classifier_name_list, temp_classifier_list = get_discriminant_classifiers()
+    classifier_list.extend(temp_classifier_list)
+    classifier_name_list.extend(temp_classifier_name_list)
+    temp_classifier_name_list, temp_classifier_list = get_knn_classifier(n_neighbors=n_neighbors)
+    classifier_list.extend(temp_classifier_list)
+    classifier_name_list.extend(temp_classifier_name_list)
+    temp_classifier_name_list, temp_classifier_list = get_sgd_classifier()
+    classifier_list.extend(temp_classifier_list)
+    classifier_name_list.extend(temp_classifier_name_list)
+
+    return classifier_name_list, classifier_list

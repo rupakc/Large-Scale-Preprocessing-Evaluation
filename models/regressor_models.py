@@ -52,3 +52,23 @@ def get_support_vector_regression(kernel='rbf'):
     svr = SVR(kernel=kernel)
     svr_model_name = 'SVM_' + kernel
     return [svr_model_name],[svr]
+
+
+def get_all_regressors(n_hidden_units=100, k=5, kernel='rbf'):
+    classifier_name_list, classifier_list = get_linear_regressors()
+    temp_classifier_name_list, temp_classifier_list = get_support_vector_regression(kernel=kernel)
+    classifier_name_list.extend(temp_classifier_name_list)
+    classifier_list.extend(temp_classifier_list)
+    temp_classifier_name_list, temp_classifier_list = get_ensemble_regressors()
+    classifier_name_list.extend(temp_classifier_name_list)
+    classifier_list.extend(temp_classifier_list)
+    temp_classifier_name_list, temp_classifier_list = get_knn_regressor(k=k)
+    classifier_name_list.extend(temp_classifier_name_list)
+    classifier_list.extend(classifier_list)
+    temp_classifier_name_list, temp_classifier_list = get_neural_network_regressor(n_hidden_units=n_hidden_units)
+    classifier_name_list.extend(temp_classifier_name_list)
+    classifier_list.extend(temp_classifier_list)
+    temp_classifier_name_list, temp_classifier_list = get_gaussian_process_regressor()
+    classifier_name_list.extend(temp_classifier_name_list)
+    classifier_list.extend(temp_classifier_list)
+    return classifier_name_list, classifier_list
