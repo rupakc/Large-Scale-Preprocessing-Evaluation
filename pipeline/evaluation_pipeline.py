@@ -57,7 +57,7 @@ class EvaluationPipeline:
                 predicted_values = model.predict(X_test)
                 if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE:
                     metric_dict = metric_utils.get_classification_metrics(y_test, predicted_values)
-                    metric_dict_list.append(metric_dict)
+                    metric_dict_list.append(metric_dict) # TODO - Make a dictionary out of this
                 else:
                     metric_dict = metric_utils.get_regression_metrics(y_test, predicted_values)
                     metric_dict_list.append(metric_dict)
@@ -70,3 +70,6 @@ class EvaluationPipeline:
 
     def persist_evaluation_result(self):
         pass # TODO - Write code for persisting the results
+
+    def execute_pipeline(self):
+        pass
