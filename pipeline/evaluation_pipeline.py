@@ -50,18 +50,23 @@ class EvaluationPipeline:
             return cluster_models.get_clustering_algorithm_list()
 
     def evaluate_model(self,model_list, model_name_list, X_train, X_test, y_train, y_test):
-        metric_dict = dict({})
+        metric_dict_list = list([])
         if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE or self.type_of_model.lower() == model_constants.REGRESSION_TYPE:
             for model, model_name in zip(model_list, model_name_list):
                 model.fit(X_train, y_train)
                 predicted_values = model.predict(X_test)
                 if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE:
                     metric_dict = metric_utils.get_classification_metrics(y_test, predicted_values)
+                    metric_dict_list.append(metric_dict)
                 else:
                     metric_dict = metric_utils.get_regression_metrics(y_test, predicted_values)
-
-        # TODO - Add clustering metrics here
-        return metric_dict
+                    metric_dict_list.append(metric_dict)
+        elif self.type_of_model.lower() == model_constants.CLUSTER_TYPE:
+            for model_name in model_name_list:
+                cluster_labels, _ = cluster_models.get_clustered_data(X_train,clustering_algorithm=model_name)
+                metric_dict = metric_utils.get_clustering_metrics(X_train, cluster_labels)
+                metric_dict_list.append(metric_dict)
+        return metric_dict_list
 
     def persist_evaluation_result(self):
         pass # TODO - Write code for persisting the results
