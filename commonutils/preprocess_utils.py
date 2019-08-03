@@ -79,3 +79,19 @@ def get_imputed_data(dataframe, columns_to_impute, type_of_imputation='mean'):
 
 def get_imputer_object(type_of_imputation='mean'):
     return SimpleImputer(strategy=type_of_imputation)
+
+
+def get_preprocessing_techiques_list():
+
+    impute_algorithm_list= [model_constants.MEAN_IMPUTATION, model_constants.MEDIAN_IMPUTATION,
+                            model_constants.MOST_FREQUENT_IMPUTATION]
+    encoding_algorithm_list = [model_constants.ONE_HOT_ENCODING, model_constants.LABEL_ENCODING,
+                               model_constants.ORDINAL_ENCODING]
+    scaling_algorithm_list = [model_constants.MIN_MAX_SCALER, model_constants.STANDARD_SCALER,
+                              model_constants.MAX_ABS_SCALER, model_constants.ROBUST_SCALER,
+                              model_constants.NORMALIZER]
+    transformation_algorithm_list = [model_constants.POWER_TRANSFORMER, model_constants.QUANTILE_TRANSFORMER,
+                                     model_constants.POLYNOMIAL_TRANSFORMER]
+
+    return impute_algorithm_list, encoding_algorithm_list, scaling_algorithm_list, transformation_algorithm_list
+
