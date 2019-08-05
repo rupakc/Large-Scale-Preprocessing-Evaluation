@@ -12,7 +12,7 @@ Steps in the pipeline to be executed sequentially -
 from commonutils import data_load_utils, metric_utils, preprocess_utils
 from models import classifier_models, regressor_models, cluster_models
 from constants import model_constants
-from commonutils import split_data, merge_utils
+from commonutils import split_data, merge_utils, dbutils
 
 
 class EvaluationPipeline:
@@ -50,7 +50,7 @@ class EvaluationPipeline:
         else:
             return cluster_models.get_clustering_algorithm_list()
 
-    def evaluate_model(self,model_list, model_name_list, X_train, X_test, y_train, y_test):
+    def evaluate_model(self, model_list, model_name_list, X_train, X_test, y_train, y_test):
         master_metric_dict = dict({})
         if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE or self.type_of_model.lower() == model_constants.REGRESSION_TYPE:
             for model, model_name in zip(model_list, model_name_list):
@@ -69,8 +69,9 @@ class EvaluationPipeline:
                 master_metric_dict[model_name] = metric_dict
         return master_metric_dict
 
-    def persist_evaluation_result(self, dict_to_insert):
-        pass # TODO - Write code for persisting the results
+    @staticmethod
+    def persist_evaluation_result(dict_to_insert):
+        dbutils.check_for_duplicate_and_insert(dict_to_insert)
 
     def execute_pipeline(self):
         dataframe, metadata_dict = self.get_data_and_metadata()
@@ -102,5 +103,11 @@ class EvaluationPipeline:
                             metric_dict = master_metric_dict[model_name]
                             merged_dict = merge_utils.merge_dicts(metric_dict, summary_dict)
                             merged_dict = merge_utils.merge_dicts(merged_dict, metadata_dict)
+                            merged_dict['imputer'] = impute_algorithm
+                            merged_dict['encoder'] = encoding_algorithm
+                            merged_dict['transformer'] = transformation_algorithm
+                            merged_dict['scaler'] = scaling_algorithm
+                            merged_dict['model_name'] = model_name
+                            merged_dict['unique_hash'] = dbutils.get_dictionary_hash(merged_dict)
                             self.persist_evaluation_result(merged_dict)
 
