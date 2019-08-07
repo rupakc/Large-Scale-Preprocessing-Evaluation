@@ -26,9 +26,11 @@ class EvaluationPipeline:
         metadata = data_load_utils.get_json_content(metadata_filepath)
         return dataframe, metadata
 
-    @staticmethod
-    def calculate_summary_statistics(dataframe):
-        return {} # TODO - Add summary stats here
+    def calculate_summary_statistics(self,dataframe):
+        num_rows = len(dataframe)
+        num_columns = len(dataframe.columns)
+        data_filename = self.filepath.rsplit('\\',1)[1].replace(model_constants.DATA_FILE_EXTENSION,'')
+        return {'num_rows': num_rows, 'num_columns': num_columns, 'data_filename': data_filename} # TODO - Add summary stats here
 
     @staticmethod
     def get_processed_dataframe(dataframe, columns_to_impute, columns_to_encode, columns_to_scale,
