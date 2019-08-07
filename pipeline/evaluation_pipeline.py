@@ -30,7 +30,7 @@ class EvaluationPipeline:
         num_rows = len(dataframe)
         num_columns = len(dataframe.columns)
         data_filename = self.filepath.rsplit('\\',1)[1].replace(model_constants.DATA_FILE_EXTENSION,'')
-        return {'num_rows': num_rows, 'num_columns': num_columns, 'data_filename': data_filename} # TODO - Add summary stats here
+        return {'num_rows': num_rows, 'num_columns': num_columns, 'data_filename': data_filename}
 
     @staticmethod
     def get_processed_dataframe(dataframe, columns_to_impute, columns_to_encode, columns_to_scale,
@@ -82,7 +82,7 @@ class EvaluationPipeline:
 
     def execute_pipeline(self):
         dataframe, metadata_dict = self.get_data_and_metadata()
-        summary_dict = self.calculate_summary_statistics(dataframe) # TODO - Add summary stats here
+        summary_dict = self.calculate_summary_statistics(dataframe)
         impute_algorithm_list, encoding_algorithm_list, \
         scaling_algorithm_list, transformation_algorithm_list = preprocess_utils.get_preprocessing_techiques_list()
 
@@ -116,6 +116,7 @@ class EvaluationPipeline:
                             merged_dict['transformer'] = transformation_algorithm
                             merged_dict['scaler'] = scaling_algorithm
                             merged_dict['model_name'] = model_name
+                            merged_dict['model_type'] = self.type_of_model
                             merged_dict['unique_hash'] = dbutils.get_dictionary_hash(merged_dict)
                             self.persist_evaluation_result(merged_dict)
 
