@@ -13,6 +13,7 @@ from commonutils import data_load_utils, metric_utils, preprocess_utils
 from models import classifier_models, regressor_models, cluster_models
 from constants import model_constants
 from commonutils import split_data, merge_utils, dbutils
+import numpy as np
 
 
 class EvaluationPipeline:
@@ -35,8 +36,8 @@ class EvaluationPipeline:
     @staticmethod
     def get_processed_dataframe(dataframe, columns_to_impute, columns_to_encode, columns_to_scale,
                                 columns_to_transform, type_of_imputation ,type_of_encoding, type_of_scaling, type_of_transformation,
-                                function_transform=None, inverse_function=None,power_degree=2):
-        dataframe, _ = preprocess_utils.get_imputed_data(dataframe, columns_to_impute, type_of_imputation=type_of_imputation)
+                                function_transform=None, inverse_function=None,power_degree=2, default_missing_value=np.nan):
+        dataframe, _ = preprocess_utils.get_imputed_data(dataframe, columns_to_impute, type_of_imputation=type_of_imputation, missing_values=default_missing_value)
         dataframe, _ = preprocess_utils.get_encoded_data(dataframe, columns_to_encode, type_of_encoding=type_of_encoding)
         dataframe, _ = preprocess_utils.get_scaled_data(dataframe, columns_to_scale, type_of_scaling=type_of_scaling)
         dataframe, _ = preprocess_utils.get_transformed_data(dataframe, columns_to_transform,
@@ -111,10 +112,10 @@ class EvaluationPipeline:
                             metric_dict = master_metric_dict[model_name]
                             merged_dict = merge_utils.merge_dicts(metric_dict, summary_dict)
                             merged_dict = merge_utils.merge_dicts(merged_dict, metadata_dict)
-                            merged_dict['imputer'] = impute_algorithm
-                            merged_dict['encoder'] = encoding_algorithm
-                            merged_dict['transformer'] = transformation_algorithm
-                            merged_dict['scaler'] = scaling_algorithm
+                            merged_dict['imputer'] = impute_algorithm if len(metadata_dict['impute']) > 0 else 'None'
+                            merged_dict['encoder'] = encoding_algorithm if len(metadata_dict['encode']) > 0 else 'None'
+                            merged_dict['transformer'] = transformation_algorithm if len(metadata_dict['transform']) > 0 else 'None'
+                            merged_dict['scaler'] = scaling_algorithm if len(metadata_dict['scale']) > 0 else 'None'
                             merged_dict['model_name'] = model_name
                             merged_dict['model_type'] = self.type_of_model
                             merged_dict['unique_hash'] = dbutils.get_dictionary_hash(merged_dict)
