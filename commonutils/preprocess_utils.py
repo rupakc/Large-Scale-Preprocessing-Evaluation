@@ -4,6 +4,7 @@ from sklearn.preprocessing import FunctionTransformer, QuantileTransformer, Powe
 from sklearn.impute import SimpleImputer
 from constants import model_constants
 import pandas as pd
+import numpy as np
 import six
 
 
@@ -34,13 +35,22 @@ def get_scaler_object(type_of_scaling='minmaxscaler'):
 def get_encoded_data(dataframe, columns_to_encode, type_of_encoding='label'):
     encoder_object = get_encoder_object(type_of_encoding)
     for column in columns_to_encode:
-        dataframe[column] = encoder_object.fit_transform(dataframe[column].values.reshape(-1,1))
+        if type_of_encoding.lower() == model_constants.LABEL_ENCODING:
+            dataframe[column] = encoder_object.fit_transform(dataframe[column].values.reshape(-1,1))
+        else:
+            if type_of_encoding.lower() == model_constants.ONE_HOT_ENCODING:
+                encoded_value_list = encoder_object.fit_transform(dataframe[column].values.reshape(-1,1)).toarray()
+            else:
+                encoded_value_list = encoder_object.fit_transform(dataframe[column].values.reshape(-1, 1))
+            encoded_column_name_list = get_column_name_list(encoded_value_list)
+            dataframe[encoded_column_name_list] = pd.DataFrame(encoded_value_list)
+            del dataframe[column]
     return dataframe, encoder_object
 
 
 def get_encoder_object(type_of_encoding='label'):
     if type_of_encoding.lower() == model_constants.ONE_HOT_ENCODING:
-        return OneHotEncoder()
+        return OneHotEncoder(handle_unknown='ignore')
     elif type_of_encoding.lower() == model_constants.LABEL_ENCODING:
         return LabelEncoder()
     else:
@@ -55,7 +65,13 @@ def get_transformed_data(dataframe, columns_to_transform='all', type_of_transfor
                                  index=dataframe.index)
     else:
         for column in columns_to_transform:
-            dataframe[column] = transformer_object.fit_transform(dataframe[column].values.reshape(-1, 1))
+            if type_of_transformation.lower() != model_constants.POLYNOMIAL_TRANSFORMER:
+                dataframe[column] = transformer_object.fit_transform(dataframe[column].values.reshape(-1, 1))
+            else:
+                encoded_value_list = transformer_object.fit_transform(dataframe[column].values.reshape(-1, 1))
+                encoded_column_name_list = get_column_name_list(encoded_value_list)
+                dataframe[encoded_column_name_list] = pd.DataFrame(encoded_value_list)
+                del dataframe[column]
     return dataframe, transformer_object
 
 
@@ -71,15 +87,15 @@ def get_transformer_object(type_of_transformation='power', function_transform=No
         return PolynomialFeatures(degree=power_degree)
 
 
-def get_imputed_data(dataframe, columns_to_impute, type_of_imputation='mean'):
-    imputer_object = get_imputer_object(type_of_imputation)
+def get_imputed_data(dataframe, columns_to_impute, type_of_imputation='mean', missing_values=np.nan):
+    imputer_object = get_imputer_object(type_of_imputation, missing_values=missing_values)
     for column in columns_to_impute:
         dataframe[column] = imputer_object.fit_transform(dataframe[column].values.reshape(-1,1))
     return dataframe, imputer_object
 
 
-def get_imputer_object(type_of_imputation='mean'):
-    return SimpleImputer(strategy=type_of_imputation)
+def get_imputer_object(type_of_imputation='mean', missing_values=np.nan):
+    return SimpleImputer(strategy=type_of_imputation, missing_values=missing_values)
 
 
 def get_preprocessing_techiques_list():
@@ -101,3 +117,9 @@ def check_string_type(data_object):
     if isinstance(data_object, six.string_types):
         return True
     return False
+
+
+def get_column_name_list(value_array_list):
+    num_unique_values = len(value_array_list[0])
+    encoded_column_list = ['transformed_column_'+ str(i) for i in range(num_unique_values)]
+    return encoded_column_list
