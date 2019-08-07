@@ -9,7 +9,7 @@ def get_dictionary_hash(network_object_dict):
         network_config_string = network_config_string + str(network_value) + '_'
     network_config_string = network_config_string[:-1]
     hash_digest = hashlib.sha1(network_config_string.encode())
-    return hash_digest
+    return hash_digest.hexdigest()
 
 
 def get_mongo_connection(db_name=dbconstants.DB_NAME, collection_name=dbconstants.COLLECTION_NAME):

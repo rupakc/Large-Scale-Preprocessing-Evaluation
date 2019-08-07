@@ -91,7 +91,7 @@ def get_grad_boost_classifier():
 
 
 def get_all_classifiers(n_hidden_units=100, n_neighbors=5):
-    classifier_list, classifier_name_list = get_ensemble_tree_classifiers()
+    classifier_name_list, classifier_list = get_ensemble_tree_classifiers()
     temp_classifier_name_list, temp_classifier_list = get_support_vector_classifiers()
     classifier_list.extend(temp_classifier_list)
     classifier_name_list.extend(temp_classifier_name_list)

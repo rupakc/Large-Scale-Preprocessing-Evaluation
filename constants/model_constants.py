@@ -28,3 +28,7 @@ REGRESSION_TYPE = 'regression'
 CLUSTER_TYPE = 'clustering'
 LOG_FILE_PATH = ''
 TARGET_COLUMN_LABEL = 'target'
+META_DATA_FILE_EXTENSION = '.json'
+META_DATA_FILE_SUFFIX = '_meta'
+DATA_FILE_EXTENSION = '.csv'
+

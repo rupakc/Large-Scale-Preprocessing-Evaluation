@@ -22,21 +22,22 @@ class EvaluationPipeline:
 
     def get_data_and_metadata(self):
         dataframe = data_load_utils.get_dataframe_from_file_name(filepath=self.filepath)
-        # TODO - Get metadata from the file
-        return dataframe, None
+        metadata_filepath = data_load_utils.get_meta_data_filepath(filepath=self.filepath)
+        metadata = data_load_utils.get_json_content(metadata_filepath)
+        return dataframe, metadata
 
     @staticmethod
     def calculate_summary_statistics(dataframe):
-        pass # TODO - Add summary stats here
+        return {} # TODO - Add summary stats here
 
     @staticmethod
     def get_processed_dataframe(dataframe, columns_to_impute, columns_to_encode, columns_to_scale,
                                 columns_to_transform, type_of_imputation ,type_of_encoding, type_of_scaling, type_of_transformation,
                                 function_transform=None, inverse_function=None,power_degree=2):
-        dataframe = preprocess_utils.get_imputed_data(dataframe, columns_to_impute, type_of_imputation=type_of_imputation)
-        dataframe = preprocess_utils.get_encoded_data(dataframe, columns_to_encode, type_of_encoding=type_of_encoding)
-        dataframe = preprocess_utils.get_scaled_data(dataframe, columns_to_scale, type_of_scaling=type_of_scaling)
-        dataframe = preprocess_utils.get_transformed_data(dataframe, columns_to_transform,
+        dataframe, _ = preprocess_utils.get_imputed_data(dataframe, columns_to_impute, type_of_imputation=type_of_imputation)
+        dataframe, _ = preprocess_utils.get_encoded_data(dataframe, columns_to_encode, type_of_encoding=type_of_encoding)
+        dataframe, _ = preprocess_utils.get_scaled_data(dataframe, columns_to_scale, type_of_scaling=type_of_scaling)
+        dataframe, _ = preprocess_utils.get_transformed_data(dataframe, columns_to_transform,
                                                           type_of_transformation=type_of_transformation,
                                                           function_transform=function_transform,
                                                           inverse_function=inverse_function, power_degree=power_degree)
@@ -54,14 +55,18 @@ class EvaluationPipeline:
         master_metric_dict = dict({})
         if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE or self.type_of_model.lower() == model_constants.REGRESSION_TYPE:
             for model, model_name in zip(model_list, model_name_list):
-                model.fit(X_train, y_train)
-                predicted_values = model.predict(X_test)
-                if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE:
-                    metric_dict = metric_utils.get_classification_metrics(y_test, predicted_values)
-                    master_metric_dict[model_name] = metric_dict
-                else:
-                    metric_dict = metric_utils.get_regression_metrics(y_test, predicted_values)
-                    master_metric_dict[model_name] = metric_dict
+                try:
+                    model.fit(X_train, y_train)
+                    predicted_values = model.predict(X_test)
+                    if self.type_of_model.lower() == model_constants.CLASSIFICATION_TYPE:
+                        metric_dict = metric_utils.get_classification_metrics(y_test, predicted_values)
+                        master_metric_dict[model_name] = metric_dict
+                    else:
+                        metric_dict = metric_utils.get_regression_metrics(y_test, predicted_values)
+                        master_metric_dict[model_name] = metric_dict
+                except Exception as exception:
+                    print(exception.__str__())
+
         elif self.type_of_model.lower() == model_constants.CLUSTER_TYPE:
             for model_name in model_name_list:
                 cluster_labels, _ = cluster_models.get_clustered_data(X_train,clustering_algorithm=model_name)
@@ -83,7 +88,8 @@ class EvaluationPipeline:
             for encoding_algorithm in encoding_algorithm_list:
                 for scaling_algorithm in scaling_algorithm_list:
                     for transformation_algorithm in transformation_algorithm_list:
-                        preprocessed_dataframe = self.get_processed_dataframe(dataframe, metadata_dict['impute'],
+                        copy_dataframe = dataframe.copy(deep=True)
+                        preprocessed_dataframe = self.get_processed_dataframe(copy_dataframe, metadata_dict['impute'],
                                                                               metadata_dict['encode'],
                                                                               metadata_dict['scale'],
                                                                               metadata_dict['transform'],
@@ -111,3 +117,6 @@ class EvaluationPipeline:
                             merged_dict['unique_hash'] = dbutils.get_dictionary_hash(merged_dict)
                             self.persist_evaluation_result(merged_dict)
 
+
+e = EvaluationPipeline(filepath='C:\\Users\\rupachak\\Desktop\\Papers-2019\\Large Scale Preprocessing Evaluation\\raw data\\heart.csv')
+e.execute_pipeline()

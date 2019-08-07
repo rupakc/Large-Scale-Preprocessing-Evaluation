@@ -4,16 +4,17 @@ from sklearn.preprocessing import FunctionTransformer, QuantileTransformer, Powe
 from sklearn.impute import SimpleImputer
 from constants import model_constants
 import pandas as pd
+import six
 
 
 def get_scaled_data(dataframe, columns_to_scale='all', type_of_scaling='minmaxscaler'):
     scaler_object = get_scaler_object(type_of_scaling)
-    if columns_to_scale.lower() == 'all':
+    if check_string_type(columns_to_scale) and columns_to_scale.lower() == 'all':
         dataframe = pd.DataFrame(data=scaler_object.fit_transform(dataframe.values), columns=dataframe.columns,
                                  index=dataframe.index)
     else:
         for column_name in columns_to_scale:
-            dataframe[column_name] = scaler_object.fit_transform(dataframe[column_name].values)
+            dataframe[column_name] = scaler_object.fit_transform(dataframe[column_name].values.reshape(-1,1))
     return dataframe, scaler_object
 
 
@@ -33,7 +34,7 @@ def get_scaler_object(type_of_scaling='minmaxscaler'):
 def get_encoded_data(dataframe, columns_to_encode, type_of_encoding='label'):
     encoder_object = get_encoder_object(type_of_encoding)
     for column in columns_to_encode:
-        dataframe[column] = encoder_object.fit_transform(dataframe[column].values)
+        dataframe[column] = encoder_object.fit_transform(dataframe[column].values.reshape(-1,1))
     return dataframe, encoder_object
 
 
@@ -49,12 +50,12 @@ def get_encoder_object(type_of_encoding='label'):
 def get_transformed_data(dataframe, columns_to_transform='all', type_of_transformation='power',
                          function_transform=None, inverse_function=None, power_degree=2):
     transformer_object = get_transformer_object(type_of_transformation, function_transform, inverse_function, power_degree)
-    if columns_to_transform.lower() == 'all':
+    if check_string_type(columns_to_transform) and columns_to_transform.lower() == 'all':
         dataframe = pd.DataFrame(data=transformer_object.fit_transform(dataframe.values), columns=dataframe.columns,
                                  index=dataframe.index)
     else:
         for column in columns_to_transform:
-            dataframe[column] = transformer_object.fit_transform(dataframe[column].values)
+            dataframe[column] = transformer_object.fit_transform(dataframe[column].values.reshape(-1, 1))
     return dataframe, transformer_object
 
 
@@ -73,7 +74,7 @@ def get_transformer_object(type_of_transformation='power', function_transform=No
 def get_imputed_data(dataframe, columns_to_impute, type_of_imputation='mean'):
     imputer_object = get_imputer_object(type_of_imputation)
     for column in columns_to_impute:
-        dataframe[column] = imputer_object.fit_transform(dataframe[column].values)
+        dataframe[column] = imputer_object.fit_transform(dataframe[column].values.reshape(-1,1))
     return dataframe, imputer_object
 
 
@@ -95,3 +96,8 @@ def get_preprocessing_techiques_list():
 
     return impute_algorithm_list, encoding_algorithm_list, scaling_algorithm_list, transformation_algorithm_list
 
+
+def check_string_type(data_object):
+    if isinstance(data_object, six.string_types):
+        return True
+    return False
