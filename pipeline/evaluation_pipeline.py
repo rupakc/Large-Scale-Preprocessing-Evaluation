@@ -81,7 +81,7 @@ class EvaluationPipeline:
                     master_metric_dict[model_name] = metric_dict
                 except Exception as exception:
                     print(exception.__str__())
-                    LOGGER.error('An error occured in cluster part of evaluation model %s' % exception.__str__())
+                    LOGGER.error('An error occurred in cluster part of evaluation model %s' % exception.__str__())
         return master_metric_dict
 
     @staticmethod
@@ -93,21 +93,36 @@ class EvaluationPipeline:
         summary_dict = self.calculate_summary_statistics(dataframe)
         impute_algorithm_list, encoding_algorithm_list, \
         scaling_algorithm_list, transformation_algorithm_list = preprocess_utils.get_preprocessing_techiques_list()
-
+        missing_value = metadata_dict['missing_value']
         for impute_algorithm in impute_algorithm_list:
             for encoding_algorithm in encoding_algorithm_list:
                 for scaling_algorithm in scaling_algorithm_list:
                     for transformation_algorithm in transformation_algorithm_list:
                         try:
                             copy_dataframe = dataframe.copy(deep=True)
-                            preprocessed_dataframe = self.get_processed_dataframe(copy_dataframe, metadata_dict['impute'],
-                                                                                  metadata_dict['encode'],
-                                                                                  metadata_dict['scale'],
-                                                                                  metadata_dict['transform'],
-                                                                                  impute_algorithm, encoding_algorithm,
-                                                                                  scaling_algorithm, transformation_algorithm)
+                            if str(missing_value).lower() == model_constants.NONE_MISSING_VALUES:
+                                preprocessed_dataframe = self.get_processed_dataframe(copy_dataframe, metadata_dict['impute'],
+                                                                                      metadata_dict['encode'],
+                                                                                      metadata_dict['scale'],
+                                                                                      metadata_dict['transform'],
+                                                                                      impute_algorithm,
+                                                                                      encoding_algorithm,
+                                                                                      scaling_algorithm,
+                                                                                      transformation_algorithm)
+                            else:
+                                preprocessed_dataframe = self.get_processed_dataframe(copy_dataframe,
+                                                                                      metadata_dict['impute'],
+                                                                                      metadata_dict['encode'],
+                                                                                      metadata_dict['scale'],
+                                                                                      metadata_dict['transform'],
+                                                                                      impute_algorithm,
+                                                                                      encoding_algorithm,
+                                                                                      scaling_algorithm,
+                                                                                      transformation_algorithm,
+                                                                                      default_missing_value=missing_value)
 
                             model_name_list, model_list = self.get_machine_learning_models()
+
                             if self.type_of_model == model_constants.CLASSIFICATION_TYPE or self.type_of_model == model_constants.REGRESSION_TYPE:
                                 class_labels_or_values = preprocessed_dataframe[model_constants.TARGET_COLUMN_LABEL].values
                                 del preprocessed_dataframe[model_constants.TARGET_COLUMN_LABEL]

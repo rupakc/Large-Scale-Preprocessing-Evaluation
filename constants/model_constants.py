@@ -33,3 +33,4 @@ META_DATA_FILE_SUFFIX = '_meta'
 DATA_FILE_EXTENSION = '.csv'
 HASH_GENERATION_COLUMN_LIST = ['num_rows', 'num_columns', 'data_filename', 'imputer', 'encoder',
                                'transformer', 'scaler', 'model_name', 'model_type']
+NONE_MISSING_VALUES = 'none'
