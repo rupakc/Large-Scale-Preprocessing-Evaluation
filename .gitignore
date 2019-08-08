@@ -108,3 +108,4 @@ venv.bak/
 
 # project specific settings
 playground/
+logs/*.log

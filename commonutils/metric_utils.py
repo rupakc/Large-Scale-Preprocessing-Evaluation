@@ -43,7 +43,7 @@ def get_regression_metrics(ground_truth_value, predicted_value):
     regression_metric_dict = dict({})
     regression_metric_dict['r2_score'] = r2_score(ground_truth_value, predicted_value)
     regression_metric_dict['mean_squared_error'] = mean_squared_error(ground_truth_value, predicted_value)
-    regression_metric_dict['mean_squared_log_error'] = mean_squared_log_error(ground_truth_value, predicted_value)
+    #regression_metric_dict['mean_squared_log_error'] = mean_squared_log_error(ground_truth_value, predicted_value)
     regression_metric_dict['mean_absolute_error'] = mean_absolute_error(ground_truth_value, predicted_value)
     regression_metric_dict['explained_variance_score'] = explained_variance_score(ground_truth_value, predicted_value)
     regression_metric_dict['median_absolute_error'] = median_absolute_error(ground_truth_value, predicted_value)

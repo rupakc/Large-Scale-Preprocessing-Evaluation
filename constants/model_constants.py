@@ -26,10 +26,10 @@ BIRCH = 'birch'
 CLASSIFICATION_TYPE = 'classification'
 REGRESSION_TYPE = 'regression'
 CLUSTER_TYPE = 'clustering'
-LOG_FILE_PATH = ''
+LOG_FILE_PATH = 'C:\\Users\\rupachak\\Documents\\Github\\Large-Scale-Preprocessing-Evaluation\\logs\\app.log'
 TARGET_COLUMN_LABEL = 'target'
 META_DATA_FILE_EXTENSION = '.json'
 META_DATA_FILE_SUFFIX = '_meta'
 DATA_FILE_EXTENSION = '.csv'
-HASH_GENERATION_COLUMN_LIST = ['num_rows','num_columns','data_filename','imputer','encoder',
-                               'transformer','scaler','model_name','model_type']
+HASH_GENERATION_COLUMN_LIST = ['num_rows', 'num_columns', 'data_filename', 'imputer', 'encoder',
+                               'transformer', 'scaler', 'model_name', 'model_type']

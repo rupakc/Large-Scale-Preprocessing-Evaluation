@@ -38,6 +38,6 @@ def get_clustering_algorithm_list():
    clustering_model_name_list = [model_constants.AFFINITY_PROP, model_constants.DBSCAN,
                                  model_constants.KMEANS, model_constants.OPTICS,
                                  model_constants.AGGLOMERATIVE, model_constants.MEANSHIFT, model_constants.BIRCH]
-   return clustering_model_name_list
+   return clustering_model_name_list, None
 
 
