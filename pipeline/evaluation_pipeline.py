@@ -148,5 +148,10 @@ class EvaluationPipeline:
                             LOGGER.error('An error occurred in execute pipeline %s ' % exception.__str__())
 
 
-e = EvaluationPipeline(filepath='C:\\Users\\rupachak\\Desktop\\Papers-2019\\Large Scale Preprocessing Evaluation\\raw data\\heart.csv', type_of_model='classification')
-e.execute_pipeline()
+if __name__ == '__main__':
+    data_folder_path_list, type_of_model_list = data_load_utils.get_datafilename_and_model_type_list()
+    for filepath, type_of_model in zip(data_folder_path_list, type_of_model_list):
+        LOGGER.info("Pipeline started for data : %s " % filepath)
+        e = EvaluationPipeline(filepath=filepath, type_of_model=type_of_model)
+        e.execute_pipeline()
+        LOGGER.info("Pipeline completed for data : %s " % filepath)
